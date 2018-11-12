@@ -16,7 +16,10 @@ struct UuidProxy(uuid::Uuid);
 impl FromSql<Uuid, Pg> for uuid::Uuid {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let bytes = not_none!(bytes);
-        uuid::Uuid::from_bytes(bytes).map_err(|e| e.into())
+        assert_eq!(bytes.len(), 16);
+        let mut array = [0; 16];
+        array.copy_from_slice(bytes);
+        Ok(uuid::Uuid::from_bytes(array))
     }
 }
 
